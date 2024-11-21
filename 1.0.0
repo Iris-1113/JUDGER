@@ -1,0 +1,268 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<title>BMI和腰围判断器</title>  
+<meta charset="utf-8">  
+<style>   
+body {  
+  font-family: sans-serif;  
+}  
+.container {  
+  width: 500px;  
+  margin: 0 auto;  
+  padding: 20px;  
+  border: 1px solid #ccc;  
+  border-radius: 5px;  
+}  
+.form-group {  
+  margin-bottom: 15px;  
+}  
+label {  
+  display: block;  
+  margin-bottom: 5px;  
+}  
+input[type="number"],  
+select {  
+  width: 100%;  
+  padding: 8px;  
+  border: 1px solid #ccc;  
+  border-radius: 3px;  
+  box-sizing: border-box;  
+}  
+button {  
+  background-color: #4CAF50;  
+  color: white;  
+  padding: 10px 15px;  
+  border: none;  
+  border-radius: 3px;  
+  cursor: pointer;  
+}  
+ #bmi-result, #waist-result {  
+ margin-top:20px;  
+ font-weight: bold;  
+ }  
+</style>  
+</head>  
+<body>  
+
+<div class="container">  
+ <div class="calculator"> 
+    <h1>BMI判断器(适用于6岁及以上人群)</h1>  
+    <div class="form-group">  
+      <label for="age-bmi">年龄:</label>  
+      <input type="number" id="age-bmi" step="0.1">  
+    </div>  
+    <div class="form-group">  
+      <label for="gender-bmi">性别:</label>  
+      <select id="gender-bmi">  
+        <option value="男">男</option>  
+        <option value="女">女</option>  
+      </select>  
+    </div>  
+    <div class="form-group">  
+      <label for="height-bmi">身高(cm):</label>  
+      <input type="number" id="height-bmi"> 
+    </div>  
+    <div class="form-group">  
+      <label for="weight-bmi">体重(kg):</label>  
+      <input type="number" id="weight-bmi">  
+    </div>  
+    <button id="calculate-bmi-btn">计算BMI</button>  
+    <div id="bmi-result"></div>  
+  </div>  
+
+  <div class="calculator">  
+    <h1>腰围判断器(适用于7岁及以上人群)</h1>  
+    <div class="form-group">  
+      <label for="age-waist">年龄:</label>  
+      <input type="number" id="age-waist" step="0.1">  
+    </div>  
+    <div class="form-group">  
+      <label for="gender-waist">性别:</label>  
+      <select id="gender-waist">  
+        <option value="男">男</option>  
+        <option value="女">女</option>  
+      </select>  
+    </div>  
+    <div class="form-group">  
+      <label for="waist-circumference">腰围(cm):</label>  
+      <input type="number" id="waist-circumference">  
+    </div>  
+    <button id="calculate-waist-btn">判断腰围</button>  
+    <div id="waist-result"></div>  
+  </div>  
+</div>  
+
+<script>  
+
+ function calculateBMI() {   
+  const age = parseFloat(document.getElementById('age-bmi').value);  
+  const gender = document.getElementById('gender-bmi').value;  
+  const weight = parseFloat(document.getElementById('weight-bmi').value);  
+  const height = parseFloat(document.getElementById('height-bmi').value);  
+
+  if (isNaN(age) || isNaN(weight) || isNaN(height) || age < 6 || height <= 0 || weight <= 0) {  
+    document.getElementById('bmi-result').innerHTML = "请输入有效的年龄、体重和身高!";  
+    return;  
+  }  
+
+  const bmi = weight / ((height / 100) ** 2);  
+  const bmiRounded = bmi.toFixed(1); 
+  let result = assessBMI(age, gender, bmiRounded);  
+  document.getElementById('bmi-result').innerHTML = result;  
+}  
+
+function assessBMI(age, gender, bmiRounded) {  
+  let result = "";  
+  let standard = getBMIStandard(age, gender);  
+  if (!standard) return "请输入有效的年龄";  
+
+ if (age >= 18 && bmiRounded < standard.overthin) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}性，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于消瘦。`;  
+  } else if (age >= 18 && bmiRounded >= standard.overthin && bmiRounded < standard.thin) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}性，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于消瘦。`;  
+  } else if (age >= 18 && bmiRounded >= standard.thin && bmiRounded < standard.normal) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}性，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于正常。`;  
+  } else if (age >= 18 && bmiRounded >= standard.normal && bmiRounded < standard.overweight) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}性，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于超重。`;  
+  } else if (age >= 18 && bmiRounded >= standard.overweight) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}性，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于肥胖。`;  
+  } else if (age < 18 && bmiRounded < standard.overthin) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}生，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于中重度消瘦。`;  
+  } else if (age < 18 && bmiRounded >= standard.overthin && bmiRounded < standard.thin) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}生，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于轻度消瘦。`;  
+  } else if (age < 18 && bmiRounded >= standard.thin && bmiRounded < standard.normal) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}生，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于正常。`;  
+  } else if (age < 18 && bmiRounded >= standard.normal && bmiRounded < standard.overweight) {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}生，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于超重。`;  
+  } else {  
+    result = `您的BMI指数为：${bmiRounded}，年龄为${age}岁的${gender}生，BMI低于${standard.thin}为消瘦，在${standard.thin}~${standard.normal}之间为正常，高于${standard.normal}为超重，高于${standard.overweight}为肥胖，您属于肥胖。`;  
+  }
+  return result;
+}
+
+
+function getBMIStandard(age, gender) {  
+  if (gender === "男") {  
+    if (age >= 6 && age <= 6.49) return { overthin: 13.2, thin: 13.4, normal: 16.4, overweight: 17.7 };  
+    if (age >= 6.5 && age <= 6.99) return { overthin: 13.4, thin: 13.8, normal: 16.7, overweight: 18.1 };  
+    if (age >= 7 && age <= 7.49) return { overthin: 13.5, thin: 13.9, normal: 17, overweight: 18.7 };  
+    if (age >= 7.5 && age <= 7.99) return { overthin: 13.5, thin: 13.9, normal: 17.4, overweight: 19.2 };  
+    if (age >= 8 && age <= 8.49) return { overthin: 13.6, thin: 14.0, normal: 17.8, overweight: 19.7 };  
+    if (age >= 8.5 && age <= 8.99) return { overthin: 13.6, thin: 14.0, normal: 18.1, overweight: 20.3 };  
+    if (age >= 9 && age <= 9.49) return { overthin: 13.7, thin: 14.1, normal: 18.5, overweight: 20.8 };  
+    if (age >= 9.5 && age <= 9.99) return { overthin: 13.8, thin: 14.2, normal: 18.9, overweight: 21.4 };  
+    if (age >= 10 && age <= 10.49) return { overthin: 13.9, thin: 14.4, normal: 19.2, overweight: 21.9 };  
+    if (age >= 10.5 && age <= 10.99) return { overthin: 14.0, thin: 14.6, normal: 19.6, overweight: 22.5 };  
+    if (age >= 11 && age <= 11.49) return { overthin: 14.2, thin: 14.9, normal: 19.9, overweight: 23 };  
+    if (age >= 11.5 && age <= 11.99) return { overthin: 14.3, thin: 15.1, normal: 20.3, overweight: 23.6 };  
+    if (age >= 12 && age <= 12.49) return { overthin: 14.4, thin: 15.4, normal: 20.7, overweight: 24.1 };  
+    if (age >= 12.5 && age <= 12.99) return { overthin: 14.5, thin: 15.6, normal: 21, overweight: 24.7 };  
+    if (age >= 13 && age <= 13.49) return { overthin: 14.8, thin: 15.9, normal: 21.4, overweight: 25.2 };  
+    if (age >= 13.5 && age <= 13.99) return { overthin: 15.0, thin: 16.1, normal: 21.9, overweight: 25.7 };  
+    if (age >= 14 && age <= 14.49) return { overthin: 15.3, thin: 16.4, normal: 22.3, overweight: 26.1 };  
+    if (age >= 14.5 && age <= 14.99) return { overthin: 15.5, thin: 16.7, normal: 22.6, overweight: 26.4 };  
+    if (age >= 15 && age <= 15.49) return { overthin: 15.8, thin: 16.9, normal: 22.9, overweight: 26.6 };  
+    if (age >= 15.5 && age <= 15.99) return { overthin: 16.0, thin: 17.0, normal: 23.1, overweight: 26.9 };  
+    if (age >= 16 && age <= 16.49) return { overthin: 16.2, thin: 17.3, normal: 23.3, overweight: 27.1 };  
+    if (age >= 16.5 && age <= 16.99) return { overthin: 16.4, thin: 17.5, normal: 23.5, overweight: 27.4 };  
+    if (age >= 17 && age <= 17.49) return { overthin: 16.6, thin: 17.7, normal: 23.7, overweight: 27.6 };  
+    if (age >= 17.5 && age <= 17.99) return { overthin: 16.8, thin: 17.9, normal: 23.8, overweight: 27.8 };  
+    if (age >= 18) return { overthin: 18.5, thin: 18.5, normal: 24, overweight: 28 };  
+  } else { // 女  
+    if (age >= 6 && age <= 6.49) return { overthin: 12.8, thin: 13.1, normal: 16.2, overweight: 17.5 };  
+    if (age >= 6.5 && age <= 6.99) return { overthin: 12.9, thin: 13.3, normal: 16.5, overweight: 18 };  
+    if (age >= 7 && age <= 7.49) return { overthin: 13.0, thin: 13.4, normal: 16.8, overweight: 18.5 };  
+    if (age >= 7.5 && age <= 7.99) return { overthin: 13.0, thin: 13.5, normal: 17.2, overweight: 19 };  
+    if (age >= 8 && age <= 8.49) return { overthin: 13.1, thin: 13.6, normal: 17.6, overweight: 19.4 };  
+    if (age >= 8.5 && age <= 8.99) return { overthin: 13.1, thin: 13.7, normal: 18.1, overweight: 19.9 };  
+    if (age >= 9 && age <= 9.49) return { overthin: 13.2, thin: 13.8, normal: 18.5, overweight: 20.4 };  
+    if (age >= 9.5 && age <= 9.99) return { overthin: 13.2, thin: 13.9, normal: 19, overweight: 21 };  
+    if (age >= 10 && age <= 10.49) return { overthin: 13.3, thin: 14.0, normal: 19.5, overweight: 21.5 };  
+    if (age >= 10.5 && age <= 10.99) return { overthin: 13.4, thin: 14.1, normal: 20, overweight: 22.1 };  
+    if (age >= 11 && age <= 11.49) return { overthin: 13.7, thin: 14.3, normal: 20.5, overweight: 22.7 };  
+    if (age >= 11.5 && age <= 11.99) return { overthin: 13.9, thin: 14.5, normal: 21.1, overweight: 23.3 };  
+    if (age >= 12 && age <= 12.49) return { overthin: 14.1, thin: 14.7, normal: 21.5, overweight: 23.9 };  
+    if (age >= 12.5 && age <= 12.99) return { overthin: 14.3, thin: 14.9, normal: 21.9, overweight: 24.5 };  
+    if (age >= 13 && age <= 13.49) return { overthin: 14.6, thin: 15.3, normal: 22.2, overweight: 25 };  
+    if (age >= 13.5 && age <= 13.99) return { overthin: 14.9, thin: 15.6, normal: 22.6, overweight: 25.6 };  
+    if (age >= 14 && age <= 14.49) return { overthin: 15.3, thin: 16.0, normal: 22.8, overweight: 25.9 };  
+    if (age >= 14.5 && age <= 14.99) return { overthin: 15.7, thin: 16.3, normal: 23, overweight: 26.3 };  
+    if (age >= 15 && age <= 15.49) return { overthin: 16.0, thin: 16.6, normal: 23.2, overweight: 26.6 };  
+    if (age >= 15.5 && age <= 15.99) return { overthin: 16.2, thin: 16.8, normal: 23.4, overweight: 26.9 };  
+    if (age >= 16 && age <= 16.49) return { overthin: 16.4, thin: 17.0, normal: 23.6, overweight: 27.1 };  
+    if (age >= 16.5 && age <= 16.99) return { overthin: 16.5, thin: 17.1, normal: 23.7, overweight: 27.4 };  
+    if (age >= 17 && age <= 17.49) return { overthin: 16.6, thin: 17.2, normal: 23.8, overweight: 27.6 };  
+    if (age >= 17.5 && age <= 17.99) return { overthin: 16.7, thin: 17.3, normal: 23.9, overweight: 27.8 };  
+    if (age >= 18) return { overthin: 18.5, thin: 18.5, normal: 24, overweight: 28 };  
+  }  
+    return null;}  
+
+
+function calculateWaist() {  
+  const age = parseFloat(document.getElementById('age-waist').value);  
+  const gender = document.getElementById('gender-waist').value;  
+  const waist = parseFloat(document.getElementById('waist-circumference').value); 
+ 
+  if (isNaN(age) || isNaN(waist) || age < 7 || waist <= 0) {  
+  document.getElementById('waist-result').innerHTML = "请输入有效年龄和腰围!";  
+  return;  
+  }  
+
+  let result = assessWaistCircumference(age, gender, waist);  
+  document.getElementById('waist-result').innerHTML = result;  
+}  
+
+function assessWaistCircumference(age, gender, waist) {
+  let result = "";
+  let standard = getWaistStandard(age, gender);
+  if (!standard) return "请输入有效的年龄";
+
+  if (waist < standard.normal) {
+    result = `年龄为${age}岁的${gender}生，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您属于正常。`;
+  } else if (waist >= standard.normal && waist < standard.overweight) {
+    result = `年龄为${age}岁的${gender}生，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您的腰围已经超过正常范围。`;
+  } else {
+    result = `年龄为${age}岁的${gender}生，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您可能已属于肥胖。`;
+  }
+  return result;
+}
+
+
+function getWaistStandard(age, gender) {  
+  if (gender === "男") {  
+    if (age >= 7 && age <= 7.99) return { normal: 58.4, overweight: 63.6 };  
+    if (age >= 8 && age <= 8.99) return { normal: 60.8, overweight: 66.8 };  
+    if (age >= 9 && age <= 9.99) return { normal: 63.4, overweight: 70 };  
+    if (age >= 10 && age <= 10.99) return { normal: 65.9, overweight: 73.1 };  
+    if (age >= 11 && age <= 11.99) return { normal: 68.1, overweight: 75.6 };  
+    if (age >= 12 && age <= 12.99) return { normal: 69.8, overweight: 77.4 };  
+    if (age >= 13 && age <= 13.99) return { normal: 71.3, overweight: 78.6 };  
+    if (age >= 14 && age <= 14.99) return { normal: 72.6, overweight: 79.6 };  
+    if (age >= 15 && age <= 15.99) return { normal: 73.8, overweight: 80.5 };  
+    if (age >= 16 && age <= 16.99) return { normal: 74.8, overweight: 81.3 };  
+    if (age >= 17 && age <= 17.99) return { normal: 75.7, overweight: 82.1 };  
+    if (age == 18) return { normal: 76.8, overweight: 83 };  
+    if (age > 18) return { normal: 85, overweight: 90 };  
+  } else { // 女  
+    if (age >= 7 && age <= 7.99) return { normal: 55.8, overweight: 60.2 };  
+    if (age >= 8 && age <= 8.99) return { normal: 57.6, overweight: 62.5 };  
+    if (age >= 9 && age <= 9.99) return { normal: 59.8, overweight: 65.1 };  
+    if (age >= 10 && age <= 10.99) return { normal: 62.2, overweight: 67.8 };  
+    if (age >= 11 && age <= 11.99) return { normal: 64.6, overweight: 70.4 };  
+    if (age >= 12 && age <= 12.99) return { normal: 66.8, overweight: 72.6 };  
+    if (age >= 13 && age <= 13.99) return { normal: 68.5, overweight: 74 };  
+    if (age >= 14 && age <= 14.99) return { normal: 69.6, overweight: 74.9 };  
+    if (age >= 15 && age <= 15.99) return { normal: 70.4, overweight: 75.5 };  
+    if (age >= 16 && age <= 16.99) return { normal: 70.9, overweight: 75.8 };  
+    if (age >= 17 && age <= 17.99) return { normal: 71.2, overweight: 76 };  
+    if (age == 18) return { normal: 71.3, overweight: 76.1 };  
+    if (age > 18) return { normal: 80, overweight: 85 };  
+  }  
+return null;}  
+document.getElementById('calculate-bmi-btn').addEventListener('click', calculateBMI);
+document.getElementById('calculate-waist-btn').addEventListener('click', calculateWaist);
+</script>  
+
+</body>  
+</html>  
