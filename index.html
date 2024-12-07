@@ -220,11 +220,11 @@ function assessWaistCircumference(age, gender, waist) {
   if (!standard) return "请输入有效的年龄";
 
   if (waist < standard.normal) {
-    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您属于正常。`;
+    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，大于等于${standard.normal}cm为中心型肥胖前期，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您属于正常。`;
   } else if (waist >= standard.normal && waist < standard.overweight) {
-    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您的腰围已经超过正常范围。`;
+    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，大于等于${standard.normal}cm为中心型肥胖前期，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您的腰围已经超过正常范围。`;
   } else {
-    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，${standard.normal}cm为正常腰围上限，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您可能已属于肥胖。`;
+    result = `年龄为${age}岁的${gender}性，腰围低于${standard.normal}cm为正常，大于等于${standard.normal}cm为中心型肥胖前期，${standard.overweight}cm为肥胖腰围预警线，提示可能肥胖，您可能已属于肥胖。`;
   }
   return result;
 }
